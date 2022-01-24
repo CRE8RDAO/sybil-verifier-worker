@@ -116,7 +116,7 @@ export async function handleVerify(request) {
         let response
 
         const fileName = 'verified.json'
-        const githubPath = '/repos/Uniswap/sybil-list/contents/'
+        const githubPath = '/repos/CRE8RDAO/sybil-list/contents/'
 
         const fileInfo = await fetch(
             'https://api.github.com' + githubPath + fileName,
@@ -150,7 +150,7 @@ export async function handleVerify(request) {
         const updateResponse = await octokit.request(
             'PUT ' + githubPath + fileName,
             {
-                owner: 'uniswap',
+                owner: 'CRE8RDAO',
                 repo: 'sybil-list',
                 path: fileName,
                 message: 'Linking ' + formattedSigner + ' to handle: ' + handle,
