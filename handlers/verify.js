@@ -42,7 +42,7 @@ export async function handleVerify(request) {
         const twitterURL = `https://api.twitter.com/2/tweets?ids=${tweetID}&expansions=author_id&user.fields=username`
         requestOptions.headers.set('Origin', new URL(twitterURL).origin) // format for cors
         const twitterRes = await fetch(twitterURL, requestOptions)
-
+        console.log('twitter response:',twitterRes)
         // parse the response from Twitter
         const twitterResponse = await gatherResponse(twitterRes)
 
@@ -53,7 +53,7 @@ export async function handleVerify(request) {
                 statusText: 'Invalid tweet id',
             })
         }
-
+        console.log('twitter response2:',twitterResponse)
         // get tweet text and handle
         const tweetContent = twitterResponse.data[0].text
         const handle = twitterResponse.includes.users[0].username
@@ -72,7 +72,7 @@ export async function handleVerify(request) {
                 statusText: 'Invalid tweet format',
             })
         }
-
+        console.log('tweet is valid:',matchedText)
         // construct data for EIP712 signature recovery
         const data = {
             types: {
@@ -103,7 +103,7 @@ export async function handleVerify(request) {
 
         // format with chekcsummed address
         const formattedSigner = ethers.utils.getAddress(signer)
-
+        console.log('got sig:',sig)
         // if signer found is not the expected signer, alert client and dont update gist
         if (account !== formattedSigner) {
             return new Response(null, init, {
@@ -111,7 +111,7 @@ export async function handleVerify(request) {
                 statusText: 'Invalid account',
             })
         }
-
+        console.log('verified account = signer:')
         // initialize response
         let response
 
@@ -127,6 +127,7 @@ export async function handleVerify(request) {
                 },
             }
         )
+        console.log('got file info:',fileInfo)
         const fileJSON = await fileInfo.json()
         const sha = fileJSON.sha
 
@@ -142,7 +143,7 @@ export async function handleVerify(request) {
 
         const stringData = JSON.stringify(decodedSybilList)
         const encodedData = btoa(stringData)
-
+        console.log('encoded data:',encodedData)
         const octokit = new Octokit({
             auth: GITHUB_AUTHENTICATION,
         })
@@ -158,7 +159,7 @@ export async function handleVerify(request) {
                 content: encodedData,
             }
         )
-        
+        console.log('update response:',updateResponse.status)
         if (updateResponse.status === 200) {
             // respond with handle if succesul update
             response = new Response(handle, init, {
@@ -174,8 +175,10 @@ export async function handleVerify(request) {
 
         response.headers.set('Access-Control-Allow-Origin', '*')
         response.headers.append('Vary', 'Origin')
+        console.log('final response:',response)
         return response
     } catch (e) {
+        console.error(e)
         return new Response(null, init, {    //replaced response = with return
             status: 400,
             statusText: 'Error:' + e,
