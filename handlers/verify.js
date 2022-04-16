@@ -158,7 +158,7 @@ export async function handleVerify(request) {
                 content: encodedData,
             }
         )
-        let response;
+        
         if (updateResponse.status === 200) {
             // respond with handle if succesul update
             response = new Response(handle, init, {
@@ -176,7 +176,7 @@ export async function handleVerify(request) {
         response.headers.append('Vary', 'Origin')
         return response
     } catch (e) {
-        response = new Response(null, init, {
+        return new Response(null, init, {    //replaced response = with return
             status: 400,
             statusText: 'Error:' + e,
         })
